@@ -82,7 +82,8 @@ class PoseLandmark(enum.IntEnum):
   LEFT_FOOT_INDEX = 31
   RIGHT_FOOT_INDEX = 32
 
-BINARYPB_FILE_PATH = 'mediapipe/modules/pose_landmark/pose_landmark_cpu.binarypb'
+# BINARYPB_FILE_PATH = 'mediapipe/modules/pose_landmark/pose_landmark_cpu.binarypb'
+BINARYPB_FILE_PATH = 'mediapipe/modules/pose_landmark/pose_landmark_gpu.binarypb'
 POSE_CONNECTIONS = frozenset([
     (PoseLandmark.NOSE, PoseLandmark.RIGHT_EYE_INNER),
     (PoseLandmark.RIGHT_EYE_INNER, PoseLandmark.RIGHT_EYE),
@@ -180,9 +181,11 @@ class Pose(SolutionBase):
                 .ConstantSidePacketCalculatorOptions.ConstantSidePacket(
                     bool_value=not static_image_mode)
             ],
-            'poselandmarkcpu__posedetectioncpu__TensorsToDetectionsCalculator.min_score_thresh':
+            # 'poselandmarkcpu__posedetectioncpu__TensorsToDetectionsCalculator.min_score_thresh':
+            'poselandmarkgpu__posedetectiongpu__TensorsToDetectionsCalculator.min_score_thresh':
                 min_detection_confidence,
-            'poselandmarkcpu__poselandmarkbyroicpu__ThresholdingCalculator.threshold':
+            # 'poselandmarkcpu__poselandmarkbyroicpu__ThresholdingCalculator.threshold':
+            'poselandmarkgpu__poselandmarkbyroigpu__ThresholdingCalculator.threshold':
                 min_tracking_confidence,
         },
         outputs=['pose_landmarks', 'pose_world_landmarks'])

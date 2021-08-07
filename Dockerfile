@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM ubuntu:18.04
+FROM nvidia/cuda:10.1-cudnn7-devel-ubuntu18.04
 
-MAINTAINER <mediapipe@google.com>
+LABEL maintainer=<mediapipe@google.com>
 
 WORKDIR /io
 WORKDIR /mediapipe
@@ -39,20 +39,29 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libopencv-video-dev \
         libopencv-calib3d-dev \
         libopencv-features2d-dev \
-        software-properties-common && \
+        software-properties-common \
+        python3-venv libprotobuf-dev protobuf-compiler cmake libgtk2.0-dev \
+        mesa-common-dev libegl1-mesa-dev libgles2-mesa-dev mesa-utils \
+        pkg-config libgtk-3-dev libavcodec-dev libavformat-dev libswscale-dev libv4l-dev \
+        libxvidcore-dev libx264-dev libjpeg-dev libpng-dev libtiff-dev \
+        gfortran openexr libatlas-base-dev python3-dev python3-numpy \
+        libtbb2 libtbb-dev libdc1394-22-dev  && \
     add-apt-repository -y ppa:openjdk-r/ppa && \
     apt-get update && apt-get install -y openjdk-8-jdk && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 100 --slave /usr/bin/g++ g++ /usr/bin/g++-8
+RUN pip3 install --upgrade pip
 RUN pip3 install --upgrade setuptools
-RUN pip3 install wheel
-RUN pip3 install future
-RUN pip3 install six==1.14.0
-RUN pip3 install tensorflow==1.14.0
-RUN pip3 install tf_slim
+RUN pip3 install wheel \
+    future \
+    six==1.14.0 \
+    tensorflow==1.14.0 \
+    tf_slim
 
+COPY requirements.txt .
+RUN pip3 install -r requirements.txt
 RUN ln -s /usr/bin/python3 /usr/bin/python
 
 # Install bazel
@@ -66,6 +75,14 @@ azel-${BAZEL_VERSION}-installer-linux-x86_64.sh" && \
     rm -f /bazel/installer.sh
 
 COPY . /mediapipe/
+
+ENV TF_CUDA_PATHS=/usr/local/cuda-10.1,/usr/lib/x86_64-linux-gnu,/usr/include
+
+RUN python setup.py gen_protos
+# RUN python setup.py bdist_wheel
+RUN python setup.py install
+
+
 
 # If we want the docker image to contain the pre-built object_detection_offline_demo binary, do the following
 # RUN bazel build -c opt --define MEDIAPIPE_DISABLE_GPU=1 mediapipe/examples/desktop/demo:object_detection_tensorflow_demo

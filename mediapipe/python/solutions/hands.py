@@ -64,7 +64,7 @@ class HandLandmark(enum.IntEnum):
   PINKY_TIP = 20
 
 
-BINARYPB_FILE_PATH = 'mediapipe/modules/hand_landmark/hand_landmark_tracking_cpu.binarypb'
+BINARYPB_FILE_PATH = 'mediapipe/modules/hand_landmark/hand_landmark_tracking_gpu.binarypb'
 HAND_CONNECTIONS = frozenset([
     (HandLandmark.WRIST, HandLandmark.THUMB_CMC),
     (HandLandmark.THUMB_CMC, HandLandmark.THUMB_MCP),
@@ -137,9 +137,9 @@ class Hands(SolutionBase):
                 .ConstantSidePacketCalculatorOptions.ConstantSidePacket(
                     bool_value=not static_image_mode)
             ],
-            'palmdetectioncpu__TensorsToDetectionsCalculator.min_score_thresh':
+            'palmdetectiongpu__TensorsToDetectionsCalculator.min_score_thresh':
                 min_detection_confidence,
-            'handlandmarkcpu__ThresholdingCalculator.threshold':
+            'handlandmarkgpu__ThresholdingCalculator.threshold':
                 min_tracking_confidence,
         },
         outputs=['multi_hand_landmarks', 'multi_handedness'])
