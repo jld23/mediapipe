@@ -101,6 +101,10 @@ COPY tests /tmp
 # RUN cp /usr/include/linux/cuda.h /usr/include/
 RUN python setup.py gen_protos
 # RUN python setup.py bdist_wheel
-RUN python setup.py install
+RUN python setup.py install --link-opencv
+# RUN python -m pip install -e .
+
+
+RUN python /mediapipe/mediapipe/python/solutions/pose_test.py
 
 

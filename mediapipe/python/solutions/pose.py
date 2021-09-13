@@ -159,12 +159,12 @@ class Pose(SolutionBase):
                         bool_value=not static_image_mode)
                 ],
                 # 'posedetectioncpu__TensorsToDetectionsCalculator.min_score_thresh':
-                # 'posedetectiongpu__TensorsToDetectionsCalculator.min_score_thresh':
-                'poselandmarkgpu__posedetectiongpu__TensorsToDetectionsCalculator.min_score_thresh':
+                'posedetectiongpu__TensorsToDetectionsCalculator.min_score_thresh':
+                # 'poselandmarkgpu__posedetectiongpu__TensorsToDetectionsCalculator.min_score_thresh':
                     min_detection_confidence,
                 # 'poselandmarkbyroicpu__tensorstoposelandmarksandsegmentation__ThresholdingCalculator.threshold':
-                # 'poselandmarkbyroigpu__tensorstoposelandmarksandsegmentation__ThresholdingCalculator.threshold':
-                'poselandmarkgpu__poselandmarkbyroigpu__ThresholdingCalculator.threshold':
+                'poselandmarkbyroigpu__tensorstoposelandmarksandsegmentation__ThresholdingCalculator.threshold':
+                # 'poselandmarkgpu__poselandmarkbyroigpu__ThresholdingCalculator.threshold':
                     min_tracking_confidence,
             },
             outputs=['pose_landmarks', 'pose_world_landmarks', 'segmentation_mask'])
