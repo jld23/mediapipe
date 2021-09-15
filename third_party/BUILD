@@ -92,7 +92,7 @@ OPENCV_MODULES = [
 # to switch to static libraries.
 OPENCV_SHARED_LIBS = True
 
-OPENCV_SO_VERSION = "3.4"
+OPENCV_SO_VERSION = "4.5.3"
 
 cmake_external(
     name = "opencv_cmake",
@@ -120,6 +120,8 @@ cmake_external(
         "WITH_EIGEN": "ON",
         "WITH_PTHREADS": "ON",
         "WITH_PTHREADS_PF": "ON",
+        "DWITH_CUDA":  "ON",
+        #"DCMAKE_CXX_FLAGS:STRING" : "-I /usr/local/include/opencv4",
         # When building tests, by default Bazel builds them in dynamic mode.
         # See https://docs.bazel.build/versions/master/be/c-cpp.html#cc_binary.linkstatic
         # For example, when building //mediapipe/calculators/video:opencv_video_encoder_calculator_test,
@@ -136,7 +138,7 @@ cmake_external(
         # In any case, we don't use this.
         "OPENCV_SKIP_PYTHON_LOADER": "ON",
         # Need to set this too, for the same reason.
-        "BUILD_opencv_python": "OFF",
+        "BUILD_opencv_python": "ON",
         # Ccache causes issues in some of our CI setups. It's not clear that
         # ccache would be able to work across sandboxed Bazel builds, either.
         # In any case, Bazel does its own caching of the rule's outputs.
