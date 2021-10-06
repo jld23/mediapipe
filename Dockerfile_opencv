@@ -129,9 +129,11 @@ COPY . /mediapipe/
 COPY tests /tmp
 
 WORKDIR /mediapipe
+
+RUN python3 -m pip install -r requirements.txt
 RUN python3 setup.py gen_protos
 # RUN python3 setup.py bdist_wheel
-# RUN python3 setup.py install --link-opencv
+RUN python3 setup.py install --link-opencv
 
 
 # docker run -it --gpus all mediapipe:opencv python3 /tmp/cv_cuda.py
