@@ -1,8 +1,11 @@
 absl-py
 attrs>=19.1.0
 matplotlib
-# numpy
+numpy
 # opencv-contrib-python
 protobuf>=3.11.4
-# six
-# wheel
+six
+wheel
+tf_slim
+tensorflow-gpu
+future

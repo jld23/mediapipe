@@ -5,8 +5,6 @@ ARG CUDNN="-cudnn8" # needs '-' to get level right if blank.
 
 FROM nvidia/cuda${ARCH}:${CUDA}${CUDNN}-devel-ubuntu${UBUNTU}
 
-ARG OPENCV="4.5.3"
-
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get upgrade -y &&\
@@ -29,9 +27,7 @@ RUN apt-get update && apt-get upgrade -y &&\
     libpostproc-dev \
     libpq-dev \
     libswscale-dev \
-    libswscale-dev \
     libtbb2 \
-    libtbb-dev \
     libtbb-dev \
     libtiff5-dev \
     libtiff-dev \
@@ -45,8 +41,6 @@ RUN apt-get update && apt-get upgrade -y &&\
     python3-dev \
     python3-numpy \
     # python3.7-dev \
-    # python-dev \
-    # python-numpy \
     ## Mediapipe
     ca-certificates \
     curl \
@@ -77,40 +71,10 @@ RUN apt-get update && apt-get upgrade -y &&\
     protobuf-compiler \
     vim 
 
-WORKDIR /tmp
-RUN wget https://github.com/opencv/opencv/archive/refs/tags/${OPENCV}.zip && unzip ${OPENCV}.zip && rm ${OPENCV}.zip
-RUN wget https://github.com/opencv/opencv_contrib/archive/${OPENCV}.zip && unzip ${OPENCV}.zip && rm ${OPENCV}.zip
-RUN mkdir opencv-${OPENCV}/build && \
-    cd opencv-${OPENCV}/build && \
-    cmake -DOPENCV_EXTRA_MODULES_PATH=/tmp/opencv_contrib-${OPENCV}/modules \
-    -DWITH_CUDA=ON \
-    -DWITH_CUDNN=ON \
-    -DOPENCV_DNN_CUDA=ON \
-    -DENABLE_FAST_MATH=ON \
-    -DCUDA_FAST_MATH=ON \
-    -DCUDA_ARCH_BIN='8.0 8.6' \
-    # -DCUDA_ARCH_PTX='8.6' \
-    -DWITH_CUBLAS=ON \
-    -DOPENCV_ENABLE_NONFREE=ON \
-    # -DWITH_GSTREAMER=ON \
-    -DCMAKE_BUILD_TYPE=RELEASE \
-    -DCMAKE_INSTALL_PREFIX=/usr/local \
-    -DBUILD_TESTS=OFF \
-    -DBUILD_PERF_TESTS=OFF \
-    -DBUILD_EXAMPLES=OFF \
-    -DBUILD_opencv_apps=ON \
-    .. && \
-    make -j"$(nproc)" && \
-    # Install to /usr/local/lib
-    make install && \
-    ldconfig
-
 RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 100 --slave /usr/bin/g++ g++ /usr/bin/g++-8
 RUN python3 -m pip install --upgrade pip
 RUN python3 -m pip install --upgrade setuptools
-RUN python3 -m pip install wheel future numpy six tensorflow-gpu tf_slim
-
-# RUN ln -s /usr/bin/python3.7 /usr/bin/python3
+RUN python3 -m pip install -r requirements.txt
 
 # Install bazel
 ARG BAZEL_VERSION=3.7.2
@@ -129,11 +93,13 @@ COPY . /mediapipe/
 COPY tests /tmp
 
 WORKDIR /mediapipe
+RUN bash setup_opencv_cuda.sh
 
-RUN python3 -m pip install -r requirements.txt
+
 RUN python3 setup.py gen_protos
 # RUN python3 setup.py bdist_wheel
 RUN python3 setup.py install --link-opencv
 
 
-# docker run -it --gpus all mediapipe:opencv python3 /tmp/cv_cuda.py
+# docker run -it --gpus all  --volume="$PWD:/tmp/input_video" mediapipe:cuda python3 /tmp/cv_cuda.py
+# --ipc=host
