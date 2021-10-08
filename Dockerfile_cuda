@@ -74,7 +74,6 @@ RUN apt-get update && apt-get upgrade -y &&\
 RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 100 --slave /usr/bin/g++ g++ /usr/bin/g++-8
 RUN python3 -m pip install --upgrade pip
 RUN python3 -m pip install --upgrade setuptools
-RUN python3 -m pip install -r requirements.txt
 
 # Install bazel
 ARG BAZEL_VERSION=3.7.2
@@ -88,18 +87,16 @@ azel-${BAZEL_VERSION}-installer-linux-x86_64.sh" && \
 
 RUN rm -rf /tmp/* && rm -rf /var/lib/apt/lists/*
 
-COPY . /mediapipe/
-
 COPY tests /tmp
-
+COPY . /mediapipe/
 WORKDIR /mediapipe
+RUN python3 -m pip install -r requirements.txt
 RUN bash setup_opencv_cuda.sh
-
 
 RUN python3 setup.py gen_protos
 # RUN python3 setup.py bdist_wheel
 RUN python3 setup.py install --link-opencv
 
 
-# docker run -it --gpus all  --volume="$PWD:/tmp/input_video" mediapipe:cuda python3 /tmp/cv_cuda.py
+# docker run -it --gpus all -e LOCAL_USER_ID=`id -u` --volume="$PWD:/tmp/input_video" mediapipe:cuda python3 /tmp/cv_cuda.py
 # --ipc=host
