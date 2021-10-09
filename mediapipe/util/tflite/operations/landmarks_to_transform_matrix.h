@@ -12,26 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.google.mediapipe.solutioncore;
+#ifndef MEDIAPIPE_UTIL_TFLITE_OPERATIONS_LANDMARKS_TO_TRANSFORM_MATRIX_H_
+#define MEDIAPIPE_UTIL_TFLITE_OPERATIONS_LANDMARKS_TO_TRANSFORM_MATRIX_H_
 
-import com.google.auto.value.AutoValue;
+#include "tensorflow/lite/kernels/kernel_util.h"
 
-/**
- * The left, right, bottom, and top boundaries of the visible section on the screen. The boundary
- * values are typically within the range -1.0 and 1.0.
- */
-@AutoValue
-public abstract class ResultGlBoundary {
+namespace mediapipe {
+namespace tflite_operations {
 
-  static ResultGlBoundary create(float left, float right, float bottom, float top) {
-    return new AutoValue_ResultGlBoundary(left, right, bottom, top);
-  }
+TfLiteRegistration* RegisterLandmarksToTransformMatrixV1();
 
-  public abstract float left();
+TfLiteRegistration* RegisterLandmarksToTransformMatrixV2();
 
-  public abstract float right();
+}  // namespace tflite_operations
+}  // namespace mediapipe
 
-  public abstract float bottom();
-
-  public abstract float top();
-}
+#endif  // MEDIAPIPE_UTIL_TFLITE_OPERATIONS_LANDMARKS_TO_TRANSFORM_MATRIX_H_

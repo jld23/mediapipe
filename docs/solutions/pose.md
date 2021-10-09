@@ -88,11 +88,11 @@ from [COCO topology](https://cocodataset.org/#keypoints-2020).
 
 Method                                                                                                | Yoga <br/> [`mAP`] | Yoga <br/> [`PCK@0.2`] | Dance <br/> [`mAP`] | Dance <br/> [`PCK@0.2`] | HIIT <br/> [`mAP`] | HIIT <br/> [`PCK@0.2`]
 ----------------------------------------------------------------------------------------------------- | -----------------: | ---------------------: | ------------------: | ----------------------: | -----------------: | ---------------------:
-BlazePose.Heavy                                                                                       | 68.1               | **96.4**               | 73.0                | **97.2**                | 74.0               | **97.5**
-BlazePose.Full                                                                                        | 62.6               | **95.5**               | 67.4                | **96.3**                | 68.0               | **95.7**
-BlazePose.Lite                                                                                        | 45.0               | **90.2**               | 53.6                | **92.5**                | 53.8               | **93.5**
-[AlphaPose.ResNet50](https://github.com/MVIG-SJTU/AlphaPose)                                          | 63.4               | **96.0**               | 57.8                | **95.5**                | 63.4               | **96.0**
-[Apple.Vision](https://developer.apple.com/documentation/vision/detecting_human_body_poses_in_images) | 32.8               | **82.7**               | 36.4                | **91.4**                | 44.5               | **88.6**
+BlazePose GHUM Heavy                                                                                  | 68.1               | **96.4**               | 73.0                | **97.2**                | 74.0               | **97.5**
+BlazePose GHUM Full                                                                                   | 62.6               | **95.5**               | 67.4                | **96.3**                | 68.0               | **95.7**
+BlazePose GHUM Lite                                                                                   | 45.0               | **90.2**               | 53.6                | **92.5**                | 53.8               | **93.5**
+[AlphaPose ResNet50](https://github.com/MVIG-SJTU/AlphaPose)                                          | 63.4               | **96.0**               | 57.8                | **95.5**                | 63.4               | **96.0**
+[Apple Vision](https://developer.apple.com/documentation/vision/detecting_human_body_poses_in_images) | 32.8               | **82.7**               | 36.4                | **91.4**                | 44.5               | **88.6**
 
 ![pose_tracking_pck_chart.png](../images/mobile/pose_tracking_pck_chart.png) |
 :--------------------------------------------------------------------------: |
@@ -101,11 +101,11 @@ BlazePose.Lite                                                                  
 We designed our models specifically for live perception use cases, so all of
 them work in real-time on the majority of modern devices.
 
-Method          | Latency <br/> Pixel 3 [TFLite GPU](https://www.tensorflow.org/lite/performance/gpu_advanced) | Latency <br/> MacBook Pro (15-inch 2017)
---------------- | -------------------------------------------------------------------------------------------: | ---------------------------------------:
-BlazePose.Heavy | 53 ms                                                                                        | 38 ms
-BlazePose.Full  | 25 ms                                                                                        | 27 ms
-BlazePose.Lite  | 20 ms                                                                                        | 25 ms
+Method               | Latency <br/> Pixel 3 [TFLite GPU](https://www.tensorflow.org/lite/performance/gpu_advanced) | Latency <br/> MacBook Pro (15-inch 2017)
+-------------------- | -------------------------------------------------------------------------------------------: | ---------------------------------------:
+BlazePose GHUM Heavy | 53 ms                                                                                        | 38 ms
+BlazePose GHUM Full  | 25 ms                                                                                        | 27 ms
+BlazePose GHUM Lite  | 20 ms                                                                                        | 25 ms
 
 ## Models
 
@@ -237,7 +237,7 @@ pixel respectively. Please refer to the platform-specific usage examples below
 for usage details.
 
 *Fig 6. Example of MediaPipe Pose segmentation mask.* |
-:-----------------------------------------------------------: |
+:---------------------------------------------------: |
 <video autoplay muted loop preload style="height: auto; width: 480px"><source src="../images/mobile/pose_segmentation.mp4" type="video/mp4"></video> |
 
 ### Python Solution API
@@ -316,12 +316,10 @@ with mp_pose.Pose(
       # If loading a video, use 'break' instead of 'continue'.
       continue
 
-    # Flip the image horizontally for a later selfie-view display, and convert
-    # the BGR image to RGB.
-    image = cv2.cvtColor(cv2.flip(image, 1), cv2.COLOR_BGR2RGB)
     # To improve performance, optionally mark the image as not writeable to
     # pass by reference.
     image.flags.writeable = False
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     results = pose.process(image)
 
     # Draw the pose annotation on the image.
@@ -332,7 +330,8 @@ with mp_pose.Pose(
         results.pose_landmarks,
         mp_pose.POSE_CONNECTIONS,
         landmark_drawing_spec=mp_drawing_styles.get_default_pose_landmarks_style())
-    cv2.imshow('MediaPipe Pose', image)
+    # Flip the image horizontally for a selfie-view display.
+    cv2.imshow('MediaPipe Pose', cv2.flip(image, 1))
     if cv2.waitKey(5) & 0xFF == 27:
       break
 cap.release()
