@@ -33,7 +33,7 @@ from distutils import spawn
 import distutils.command.build as build
 import distutils.command.clean as clean
 
-__version__ = '0.8'
+__version__ = '0.8.8'
 IS_WINDOWS = (platform.system() == 'Windows')
 MP_ROOT_PATH = os.path.dirname(os.path.abspath(__file__))
 ROOT_INIT_PY = os.path.join(MP_ROOT_PATH, '__init__.py')
@@ -222,13 +222,14 @@ class BuildBinaryGraphs(build.build):
   def run(self):
     _check_bazel()
     binary_graphs = [
-        'face_detection/face_detection_short_range_cpu',
-        'face_detection/face_detection_full_range_cpu',
-        'face_landmark/face_landmark_front_cpu',
-        'hand_landmark/hand_landmark_tracking_cpu',
-        'holistic_landmark/holistic_landmark_cpu', 'objectron/objectron_cpu',
-        'pose_landmark/pose_landmark_cpu',
-        'selfie_segmentation/selfie_segmentation_cpu'
+        'face_detection/face_detection_short_range_gpu',
+        'face_detection/face_detection_full_range_gpu',
+        'face_landmark/face_landmark_front_gpu',
+        'hand_landmark/hand_landmark_tracking_gpu',
+        'holistic_landmark/holistic_landmark_gpu', 
+        'objectron/objectron_gpu',
+        'pose_landmark/pose_landmark_gpu',
+        'selfie_segmentation/selfie_segmentation_gpu'
     ]
     for binary_graph in binary_graphs:
       sys.stderr.write('generating binarypb: %s\n' %
@@ -241,9 +242,14 @@ class BuildBinaryGraphs(build.build):
     bazel_command = [
         'bazel',
         'build',
+        '--verbose_failures',
         '--compilation_mode=opt',
         '--copt=-DNDEBUG',
-        '--define=MEDIAPIPE_DISABLE_GPU=1',
+        # '--define=MEDIAPIPE_DISABLE_GPU=1',
+        '--config=cuda',
+        '--spawn_strategy=local',
+        '--copt=-DMESA_EGL_NO_X11_HEADERS',
+        '--copt=-DEGL_NO_X11',
         '--action_env=PYTHON_BIN_PATH=' + _normalize_path(sys.executable),
         os.path.join('mediapipe/modules/', graph_path),
     ]
@@ -298,9 +304,14 @@ class BuildBazelExtension(build_ext.build_ext):
     bazel_command = [
         'bazel',
         'build',
+        '--verbose_failures',
         '--compilation_mode=opt',
         '--copt=-DNDEBUG',
-        '--define=MEDIAPIPE_DISABLE_GPU=1',
+        # '--define=MEDIAPIPE_DISABLE_GPU=1',
+        '--config=cuda',
+        '--spawn_strategy=local',
+        '--copt=-DMESA_EGL_NO_X11_HEADERS',
+        '--copt=-DEGL_NO_X11',
         '--action_env=PYTHON_BIN_PATH=' + _normalize_path(sys.executable),
         str(ext.bazel_target + '.so'),
     ]

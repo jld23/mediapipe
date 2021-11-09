@@ -74,7 +74,7 @@ if [ -z "$1" ]
           -DBUILD_opencv_world=OFF -DBUILD_opencv_xobjdetect=OFF -DBUILD_opencv_xphoto=OFF \
           -DCV_ENABLE_INTRINSICS=ON -DWITH_EIGEN=ON -DWITH_PTHREADS=ON -DWITH_PTHREADS_PF=ON \
           -DWITH_JPEG=ON -DWITH_PNG=ON -DWITH_TIFF=ON
-    make -j 16
+    make -j"$(nproc)"
     sudo make install
     rm -rf /tmp/build_opencv
     echo "OpenCV has been built. You can find the header files and libraries in /usr/local/include/opencv2/ and /usr/local/lib"

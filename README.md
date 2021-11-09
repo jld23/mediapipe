@@ -154,3 +154,8 @@ We welcome contributions. Please follow these
 
 We use GitHub issues for tracking requests and bugs. Please post questions to
 the MediaPipe Stack Overflow with a `mediapipe` tag.
+
+
+## Personal notes
+
+Container does not have opencv CUDA support so that can be an additional speed up if needed.
