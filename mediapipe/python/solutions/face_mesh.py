@@ -53,72 +53,72 @@ from mediapipe.python.solutions.face_mesh_connections import FACEMESH_TESSELATIO
 
 FACEMESH_NUM_LANDMARKS = 468
 FACEMESH_NUM_LANDMARKS_WITH_IRISES = 478
-_BINARYPB_FILE_PATH = 'mediapipe/modules/face_landmark/face_landmark_front_cpu.binarypb'
+_BINARYPB_FILE_PATH = 'mediapipe/modules/face_landmark/face_landmark_front_gpu.binarypb'
 
 
 class FaceMesh(SolutionBase):
-  """MediaPipe Face Mesh.
+    """MediaPipe Face Mesh.
 
-  MediaPipe Face Mesh processes an RGB image and returns the face landmarks on
-  each detected face.
+    MediaPipe Face Mesh processes an RGB image and returns the face landmarks on
+    each detected face.
 
-  Please refer to https://solutions.mediapipe.dev/face_mesh#python-solution-api
-  for usage examples.
-  """
-
-  def __init__(self,
-               static_image_mode=False,
-               max_num_faces=1,
-               refine_landmarks=False,
-               min_detection_confidence=0.5,
-               min_tracking_confidence=0.5):
-    """Initializes a MediaPipe Face Mesh object.
-
-    Args:
-      static_image_mode: Whether to treat the input images as a batch of static
-        and possibly unrelated images, or a video stream. See details in
-        https://solutions.mediapipe.dev/face_mesh#static_image_mode.
-      max_num_faces: Maximum number of faces to detect. See details in
-        https://solutions.mediapipe.dev/face_mesh#max_num_faces.
-      refine_landmarks: Whether to further refine the landmark coordinates
-        around the eyes and lips, and output additional landmarks around the
-        irises. Default to False. See details in
-        https://solutions.mediapipe.dev/face_mesh#refine_landmarks.
-      min_detection_confidence: Minimum confidence value ([0.0, 1.0]) for face
-        detection to be considered successful. See details in
-        https://solutions.mediapipe.dev/face_mesh#min_detection_confidence.
-      min_tracking_confidence: Minimum confidence value ([0.0, 1.0]) for the
-        face landmarks to be considered tracked successfully. See details in
-        https://solutions.mediapipe.dev/face_mesh#min_tracking_confidence.
-    """
-    super().__init__(
-        binary_graph_path=_BINARYPB_FILE_PATH,
-        side_inputs={
-            'num_faces': max_num_faces,
-            'with_attention': refine_landmarks,
-            'use_prev_landmarks': not static_image_mode,
-        },
-        calculator_params={
-            'facedetectionshortrangecpu__facedetectionshortrangecommon__TensorsToDetectionsCalculator.min_score_thresh':
-                min_detection_confidence,
-            'facelandmarkcpu__ThresholdingCalculator.threshold':
-                min_tracking_confidence,
-        },
-        outputs=['multi_face_landmarks'])
-
-  def process(self, image: np.ndarray) -> NamedTuple:
-    """Processes an RGB image and returns the face landmarks on each detected face.
-
-    Args:
-      image: An RGB image represented as a numpy ndarray.
-
-    Raises:
-      RuntimeError: If the underlying graph throws any error.
-      ValueError: If the input image is not three channel RGB.
-
-    Returns:
-      A NamedTuple object with a "multi_face_landmarks" field that contains the
-      face landmarks on each detected face.
+    Please refer to https://solutions.mediapipe.dev/face_mesh#python-solution-api
+    for usage examples.
     """
 
-    return super().process(input_data={'image': image})
+    def __init__(self,
+                 static_image_mode=False,
+                 max_num_faces=1,
+                 refine_landmarks=False,
+                 min_detection_confidence=0.5,
+                 min_tracking_confidence=0.5):
+        """Initializes a MediaPipe Face Mesh object.
+
+        Args:
+          static_image_mode: Whether to treat the input images as a batch of static
+            and possibly unrelated images, or a video stream. See details in
+            https://solutions.mediapipe.dev/face_mesh#static_image_mode.
+          max_num_faces: Maximum number of faces to detect. See details in
+            https://solutions.mediapipe.dev/face_mesh#max_num_faces.
+          refine_landmarks: Whether to further refine the landmark coordinates
+            around the eyes and lips, and output additional landmarks around the
+            irises. Default to False. See details in
+            https://solutions.mediapipe.dev/face_mesh#refine_landmarks.
+          min_detection_confidence: Minimum confidence value ([0.0, 1.0]) for face
+            detection to be considered successful. See details in
+            https://solutions.mediapipe.dev/face_mesh#min_detection_confidence.
+          min_tracking_confidence: Minimum confidence value ([0.0, 1.0]) for the
+            face landmarks to be considered tracked successfully. See details in
+            https://solutions.mediapipe.dev/face_mesh#min_tracking_confidence.
+        """
+        super().__init__(
+            binary_graph_path=_BINARYPB_FILE_PATH,
+            side_inputs={
+                'num_faces': max_num_faces,
+                'with_attention': refine_landmarks,
+                'use_prev_landmarks': not static_image_mode,
+            },
+            calculator_params={
+                'facedetectionshortrangegpu__facedetectionshortrangecommon__TensorsToDetectionsCalculator.min_score_thresh':
+                    min_detection_confidence,
+                'facelandmarkgpu__ThresholdingCalculator.threshold':
+                    min_tracking_confidence,
+            },
+            outputs=['multi_face_landmarks'])
+
+    def process(self, image: np.ndarray) -> NamedTuple:
+        """Processes an RGB image and returns the face landmarks on each detected face.
+
+        Args:
+          image: An RGB image represented as a numpy ndarray.
+
+        Raises:
+          RuntimeError: If the underlying graph throws any error.
+          ValueError: If the input image is not three channel RGB.
+
+        Returns:
+          A NamedTuple object with a "multi_face_landmarks" field that contains the
+          face landmarks on each detected face.
+        """
+
+        return super().process(input_data={'image': image})

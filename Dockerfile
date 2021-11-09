@@ -14,6 +14,7 @@
 
 FROM nvidia/cuda:11.2.0-cudnn8-devel-ubuntu18.04
 
+ARG OPENCV_VERSION=4.5.3
 
 LABEL maintainer <mediapipe@google.com>
 
@@ -28,6 +29,20 @@ RUN add-apt-repository ppa:deadsnakes/ppa
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
         build-essential \
+        cmake \
+        yasm \
+        libtbb2 \
+        libpng-dev \
+        libpq-dev \
+        libxine2-dev \
+        libglew-dev \
+        libtiff5-dev \
+        zlib1g-dev \
+        libavutil-dev \
+        libpostproc-dev \
+        libeigen3-dev \
+        ## Python
+        python3-numpy \
         gcc-8 g++-8 \
         ca-certificates \
         curl \
@@ -62,14 +77,41 @@ RUN python3.7 -m pip install --upgrade setuptools
 RUN python3.7 -m pip install wheel
 RUN python3.7 -m pip install future
 RUN python3.7 -m pip install numpy
-# RUN python3.7 -m pip install six==1.14.0
 RUN python3.7 -m pip install six
-# RUN python3.7 -m pip install tensorflow-gpu==1.14.0
 RUN python3.7 -m pip install tensorflow-gpu
-RUN python3.7 -m pip install opencv-python
+# RUN python3.7 -m pip install opencv-python
+# RUN python3.7 -m pip install opencv-contrib-python
 RUN python3.7 -m pip install install tf_slim
 
 RUN ln -s /usr/bin/python3.7 /usr/bin/python
+
+# Build opencv
+RUN cd /opt/ &&\
+    # Download and unzip OpenCV and opencv_contrib and delte zip files
+    wget https://github.com/opencv/opencv/archive/$OPENCV_VERSION.zip &&\
+    unzip $OPENCV_VERSION.zip &&\
+    rm $OPENCV_VERSION.zip &&\
+    wget https://github.com/opencv/opencv_contrib/archive/$OPENCV_VERSION.zip &&\
+    unzip ${OPENCV_VERSION}.zip &&\
+    rm ${OPENCV_VERSION}.zip &&\
+    # Create build folder and switch to it
+    mkdir /opt/opencv-${OPENCV_VERSION}/build && cd /opt/opencv-${OPENCV_VERSION}/build &&\
+    # Cmake configure
+    cmake \
+        -DOPENCV_EXTRA_MODULES_PATH=/opt/opencv_contrib-${OPENCV_VERSION}/modules \
+        -DWITH_CUDA=ON \
+        -DCMAKE_BUILD_TYPE=RELEASE \
+        # Install path will be /usr/local/lib (lib is implicit)
+        -DCMAKE_INSTALL_PREFIX=/usr/local \
+        .. &&\
+    # Make
+    make -j"$(nproc)" && \
+    # Install to /usr/local/lib
+    make install && \
+    ldconfig &&\
+    # Remove OpenCV sources and build folder
+    rm -rf /opt/opencv-${OPENCV_VERSION} && rm -rf /opt/opencv_contrib-${OPENCV_VERSION}
+
 
 # Install bazel
 ARG BAZEL_VERSION=3.7.2
@@ -105,6 +147,6 @@ RUN python setup.py install --link-opencv
 # RUN python -m pip install -e .
 
 
-RUN python /mediapipe/mediapipe/python/solutions/pose_test.py
+# RUN python /mediapipe/mediapipe/python/solutions/pose_test.py
 
 

@@ -72,8 +72,7 @@ RUN apt-get update && apt-get upgrade -y &&\
     vim 
 
 RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 100 --slave /usr/bin/g++ g++ /usr/bin/g++-8
-RUN python3 -m pip install --upgrade pip
-RUN python3 -m pip install --upgrade setuptools
+RUN python3 -m pip install --upgrade pip setuptools
 
 # Install bazel
 ARG BAZEL_VERSION=3.7.2
@@ -97,6 +96,11 @@ RUN python3 setup.py gen_protos
 # RUN python3 setup.py bdist_wheel
 RUN python3 setup.py install --link-opencv
 
+# For Application
+RUN python3 pip install pandas scipy
 
-# docker run -it --gpus all -e LOCAL_USER_ID=`id -u` --volume="$PWD:/tmp/input_video" mediapipe:cuda python3 /tmp/cv_cuda.py
-# --ipc=host
+
+# docker run -it --gpus all -e LOCAL_USER_ID=`id -u` --device=/dev/video0:/dev/video0 --volume="$PWD:/tmp/input_video" mediapipe:cuda bash 
+# cd /home/dsw/source/github/pvc/battingcage
+# docker run -it --gpus all -e LOCAL_USER_ID=`id -u` --volume="$PWD:/tmp/input_video" mediapipe:cuda2  python3 /tmp/input_video/process_one_swing.py
+

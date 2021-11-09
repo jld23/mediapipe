@@ -9,3 +9,6 @@ wheel
 tf_slim
 tensorflow-gpu
 future
+# For processing swings
+pandas
+scipy

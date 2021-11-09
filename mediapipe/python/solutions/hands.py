@@ -43,98 +43,98 @@ from mediapipe.python.solutions.hands_connections import HAND_CONNECTIONS
 
 
 class HandLandmark(enum.IntEnum):
-  """The 21 hand landmarks."""
-  WRIST = 0
-  THUMB_CMC = 1
-  THUMB_MCP = 2
-  THUMB_IP = 3
-  THUMB_TIP = 4
-  INDEX_FINGER_MCP = 5
-  INDEX_FINGER_PIP = 6
-  INDEX_FINGER_DIP = 7
-  INDEX_FINGER_TIP = 8
-  MIDDLE_FINGER_MCP = 9
-  MIDDLE_FINGER_PIP = 10
-  MIDDLE_FINGER_DIP = 11
-  MIDDLE_FINGER_TIP = 12
-  RING_FINGER_MCP = 13
-  RING_FINGER_PIP = 14
-  RING_FINGER_DIP = 15
-  RING_FINGER_TIP = 16
-  PINKY_MCP = 17
-  PINKY_PIP = 18
-  PINKY_DIP = 19
-  PINKY_TIP = 20
+    """The 21 hand landmarks."""
+    WRIST = 0
+    THUMB_CMC = 1
+    THUMB_MCP = 2
+    THUMB_IP = 3
+    THUMB_TIP = 4
+    INDEX_FINGER_MCP = 5
+    INDEX_FINGER_PIP = 6
+    INDEX_FINGER_DIP = 7
+    INDEX_FINGER_TIP = 8
+    MIDDLE_FINGER_MCP = 9
+    MIDDLE_FINGER_PIP = 10
+    MIDDLE_FINGER_DIP = 11
+    MIDDLE_FINGER_TIP = 12
+    RING_FINGER_MCP = 13
+    RING_FINGER_PIP = 14
+    RING_FINGER_DIP = 15
+    RING_FINGER_TIP = 16
+    PINKY_MCP = 17
+    PINKY_PIP = 18
+    PINKY_DIP = 19
+    PINKY_TIP = 20
 
 
-_BINARYPB_FILE_PATH = 'mediapipe/modules/hand_landmark/hand_landmark_tracking_cpu.binarypb'
+_BINARYPB_FILE_PATH = 'mediapipe/modules/hand_landmark/hand_landmark_tracking_gpu.binarypb'
 
 
 class Hands(SolutionBase):
-  """MediaPipe Hands.
+    """MediaPipe Hands.
 
-  MediaPipe Hands processes an RGB image and returns the hand landmarks and
-  handedness (left v.s. right hand) of each detected hand.
+    MediaPipe Hands processes an RGB image and returns the hand landmarks and
+    handedness (left v.s. right hand) of each detected hand.
 
-  Note that it determines handedness assuming the input image is mirrored,
-  i.e., taken with a front-facing/selfie camera (
-  https://en.wikipedia.org/wiki/Front-facing_camera) with images flipped
-  horizontally. If that is not the case, use, for instance, cv2.flip(image, 1)
-  to flip the image first for a correct handedness output.
+    Note that it determines handedness assuming the input image is mirrored,
+    i.e., taken with a front-facing/selfie camera (
+    https://en.wikipedia.org/wiki/Front-facing_camera) with images flipped
+    horizontally. If that is not the case, use, for instance, cv2.flip(image, 1)
+    to flip the image first for a correct handedness output.
 
-  Please refer to https://solutions.mediapipe.dev/hands#python-solution-api for
-  usage examples.
-  """
-
-  def __init__(self,
-               static_image_mode=False,
-               max_num_hands=2,
-               min_detection_confidence=0.5,
-               min_tracking_confidence=0.5):
-    """Initializes a MediaPipe Hand object.
-
-    Args:
-      static_image_mode: Whether to treat the input images as a batch of static
-        and possibly unrelated images, or a video stream. See details in
-        https://solutions.mediapipe.dev/hands#static_image_mode.
-      max_num_hands: Maximum number of hands to detect. See details in
-        https://solutions.mediapipe.dev/hands#max_num_hands.
-      min_detection_confidence: Minimum confidence value ([0.0, 1.0]) for hand
-        detection to be considered successful. See details in
-        https://solutions.mediapipe.dev/hands#min_detection_confidence.
-      min_tracking_confidence: Minimum confidence value ([0.0, 1.0]) for the
-        hand landmarks to be considered tracked successfully. See details in
-        https://solutions.mediapipe.dev/hands#min_tracking_confidence.
-    """
-    super().__init__(
-        binary_graph_path=_BINARYPB_FILE_PATH,
-        side_inputs={
-            'num_hands': max_num_hands,
-            'use_prev_landmarks': not static_image_mode,
-        },
-        calculator_params={
-            'palmdetectioncpu__TensorsToDetectionsCalculator.min_score_thresh':
-                min_detection_confidence,
-            'handlandmarkcpu__ThresholdingCalculator.threshold':
-                min_tracking_confidence,
-        },
-        outputs=['multi_hand_landmarks', 'multi_handedness'])
-
-  def process(self, image: np.ndarray) -> NamedTuple:
-    """Processes an RGB image and returns the hand landmarks and handedness of each detected hand.
-
-    Args:
-      image: An RGB image represented as a numpy ndarray.
-
-    Raises:
-      RuntimeError: If the underlying graph throws any error.
-      ValueError: If the input image is not three channel RGB.
-
-    Returns:
-      A NamedTuple object with two fields: a "multi_hand_landmarks" field that
-      contains the hand landmarks on each detected hand and a "multi_handedness"
-      field that contains the handedness (left v.s. right hand) of the detected
-      hand.
+    Please refer to https://solutions.mediapipe.dev/hands#python-solution-api for
+    usage examples.
     """
 
-    return super().process(input_data={'image': image})
+    def __init__(self,
+                 static_image_mode=False,
+                 max_num_hands=2,
+                 min_detection_confidence=0.5,
+                 min_tracking_confidence=0.5):
+        """Initializes a MediaPipe Hand object.
+
+        Args:
+          static_image_mode: Whether to treat the input images as a batch of static
+            and possibly unrelated images, or a video stream. See details in
+            https://solutions.mediapipe.dev/hands#static_image_mode.
+          max_num_hands: Maximum number of hands to detect. See details in
+            https://solutions.mediapipe.dev/hands#max_num_hands.
+          min_detection_confidence: Minimum confidence value ([0.0, 1.0]) for hand
+            detection to be considered successful. See details in
+            https://solutions.mediapipe.dev/hands#min_detection_confidence.
+          min_tracking_confidence: Minimum confidence value ([0.0, 1.0]) for the
+            hand landmarks to be considered tracked successfully. See details in
+            https://solutions.mediapipe.dev/hands#min_tracking_confidence.
+        """
+        super().__init__(
+            binary_graph_path=_BINARYPB_FILE_PATH,
+            side_inputs={
+                'num_hands': max_num_hands,
+                'use_prev_landmarks': not static_image_mode,
+            },
+            calculator_params={
+                'palmdetectiongpu__TensorsToDetectionsCalculator.min_score_thresh':
+                    min_detection_confidence,
+                'handlandmarkgpu__ThresholdingCalculator.threshold':
+                    min_tracking_confidence,
+            },
+            outputs=['multi_hand_landmarks', 'multi_handedness'])
+
+    def process(self, image: np.ndarray) -> NamedTuple:
+        """Processes an RGB image and returns the hand landmarks and handedness of each detected hand.
+
+        Args:
+          image: An RGB image represented as a numpy ndarray.
+
+        Raises:
+          RuntimeError: If the underlying graph throws any error.
+          ValueError: If the input image is not three channel RGB.
+
+        Returns:
+          A NamedTuple object with two fields: a "multi_hand_landmarks" field that
+          contains the hand landmarks on each detected hand and a "multi_handedness"
+          field that contains the handedness (left v.s. right hand) of the detected
+          hand.
+        """
+
+        return super().process(input_data={'image': image})

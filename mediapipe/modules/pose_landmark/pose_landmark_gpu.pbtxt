@@ -115,6 +115,19 @@ output_stream: "ROI_FROM_LANDMARKS:pose_rect_from_landmarks"
 # Regions of interest calculated based on pose detections. (NormalizedRect)
 output_stream: "ROI_FROM_DETECTION:pose_rect_from_detection"
 
+
+node: {
+  calculator: "ColorConvertCalculator"
+  input_stream: "RGB_IN:image"
+  output_stream: "RGBA_OUT:image_rgba"
+}
+
+node: {
+  calculator: "ImageFrameToGpuBufferCalculator"
+  input_stream: "image_rgba"
+  output_stream: "image_gpu"
+}
+
 # When the optional input side packet "use_prev_landmarks" is either absent or
 # set to true, uses the landmarks on the previous image to help localize
 # landmarks on the current image.

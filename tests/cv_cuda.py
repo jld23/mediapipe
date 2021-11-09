@@ -7,6 +7,7 @@ print("GPUs found:{}".format(count))
 
 video = Path('AV9_14.MOV')
 
+
 def run():
 
     video_capture = cv2.VideoCapture(str(video))
@@ -21,6 +22,7 @@ def run():
         if last_frame is None or last_frame.shape != frame.shape:
             last_frame = frame
             print("Frame Shape:{}".format(frame.shape))
+
 
 timer = timeit.timeit('run()', number=10, setup="from __main__ import run")
 print("time to read video 10x :{}".format(timer))
