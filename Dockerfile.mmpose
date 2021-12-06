@@ -1,0 +1,26 @@
+FROM pytorch/pytorch:1.10.0-cuda11.3-cudnn8-devel
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get upgrade -y &&\
+    apt install software-properties-common -y &&\
+    # add-apt-repository ppa:deadsnakes/ppa &&\
+    # Install build tools, build dependencies and python
+    apt-get install -y \
+    git \
+    ffmpeg \
+    libsm6 \
+    libxext6
+
+RUN pip install mmcv-full -f https://download.openmmlab.com/mmcv/dist/cu113/torch1.10.0/index.html
+RUN git clone https://github.com/open-mmlab/mmpose.git /mmpose
+
+WORKDIR /mmpose
+RUN mkdir -p /mmpose/data
+
+ENV CUDA_HOME="/usr/local/cuda"
+ENV FORCE_CUDA="1"
+RUN pip install -r requirements/build.txt
+RUN pip install --no-cache-dir -e .
+
+
